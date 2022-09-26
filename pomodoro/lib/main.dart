@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:local_notifier/local_notifier.dart';
 import 'package:pomodoro/focus_clock/clock_setting_widget.dart';
-import 'package:pomodoro/focus_clock/clock_settings.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'focus_clock/focus_clock_widget.dart';
@@ -33,6 +33,12 @@ void main() async {
     });
 
     // windowManager.setOpacity(0.9);
+
+    await localNotifier.setup(
+      appName: 'Pomodoro',
+      // only for Windows
+      shortcutPolicy: ShortcutPolicy.requireCreate,
+    );
   }
 
   runApp(const MyApp());

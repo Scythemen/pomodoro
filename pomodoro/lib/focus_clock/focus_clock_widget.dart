@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:local_notifier/local_notifier.dart';
 import 'package:pomodoro/focus_clock/ring_painter_widget.dart';
 import 'package:pomodoro/focus_clock/clock_setting_widget.dart';
 import 'package:window_manager/window_manager.dart';
@@ -58,6 +59,12 @@ class _FocusClockState extends State<FocusClock> with WindowListener {
         _counter = ClockSettings.focusDuration;
         _counting = false;
         _timer?.cancel();
+        // nofification
+        LocalNotification notification = LocalNotification(
+          title: "Focus round completed",
+          body: "Begin a short break",
+        );
+        notification.show();
       }
 
       _ringSettings.percent =

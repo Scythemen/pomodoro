@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:pomodoro/focus_clock/clock_settings.dart';
 import 'package:pomodoro/focus_clock/draggable_form_title_bar_widget.dart';
 import 'package:window_manager/window_manager.dart';
-import 'package:intl/intl.dart' as intl;
 
 class ClockSettingWidget extends StatefulWidget {
   const ClockSettingWidget({super.key});
