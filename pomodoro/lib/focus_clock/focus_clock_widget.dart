@@ -2,9 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:pomodoro/focus_clock/ring_painter_widget.dart';
+import 'package:pomodoro/focus_clock/clock_setting_widget.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'clock_settings.dart';
+import 'draggable_form_title_bar_widget.dart';
 
 class FocusClock extends StatefulWidget {
   const FocusClock({super.key});
@@ -42,7 +44,9 @@ class _FocusClockState extends State<FocusClock> with WindowListener {
   }
 
   String fmt(Duration d) {
-    return d.toString().split('.').first.padLeft(8, "0").substring(3);
+    var arr = d.toString().split('.')[0].split(':');
+    if (int.parse(arr[0]) <= 0) arr.removeAt(0);
+    return arr.join(':');
   }
 
   void _timerCallback(Timer t) {
@@ -81,7 +85,8 @@ class _FocusClockState extends State<FocusClock> with WindowListener {
     _counter = ClockSettings.focusDuration;
     _ringSettings
       ..percent = 0.0
-      ..time = fmt(_counter);
+      ..time = fmt(ClockSettings.focusDuration);
+
     _timer?.cancel();
     setState(() {});
   }
@@ -97,37 +102,22 @@ class _FocusClockState extends State<FocusClock> with WindowListener {
       body: Center(
           child: Column(
         children: [
-          DragToMoveArea(
-            child: Stack(
-              alignment: Alignment.centerLeft,
-              fit: StackFit.loose,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Pomodoro",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          height: 2,
-                          inherit: true,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: ClockSettings.titleColor),
-                    ),
-                  ],
-                ),
-                Positioned(
-                  right: 0,
-                  top: 0,
-                  child: IconButton(
-                    color: ClockSettings.closeButtonColor,
-                    icon: const Icon(Icons.close),
-                    onPressed: _onCloseBottonPress,
-                  ),
-                ),
-              ],
+          DraggableFormTitleBarWidget(
+            title: Text(
+              "Pomodoro",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  height: 2,
+                  fontSize: ClockSettings.titleFontSize,
+                  fontWeight: FontWeight.bold,
+                  color: ClockSettings.titleColor),
             ),
+            endWidget: IconButton(
+                onPressed: _onCloseBottonPress,
+                icon: Icon(
+                  Icons.close,
+                  color: ClockSettings.titleColor,
+                )),
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
@@ -165,24 +155,13 @@ class _FocusClockState extends State<FocusClock> with WindowListener {
                       icon: const Icon(Icons.settings),
                       color: ClockSettings.buttonColor,
                       // tooltip: "Settings",
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) {
+                          return const ClockSettingWidget();
+                        }));
+                      },
                     ),
-                    // Container(
-                    //   decoration: BoxDecoration(
-                    //     border: Border.all(
-                    //         color: Color.fromARGB(255, 244, 245, 246),
-                    //         width: 2),
-                    //     shape: BoxShape.circle,
-                    //   ),
-                    //   child: IconButton(
-                    //     iconSize: 45,
-                    //     icon: Icon(
-                    //       Icons.play_arrow,
-                    //       color: Color.fromARGB(255, 244, 245, 246),
-                    //     ),
-                    //     onPressed: () {},
-                    //   ),
-                    // ),
                   ],
                 )
               ],

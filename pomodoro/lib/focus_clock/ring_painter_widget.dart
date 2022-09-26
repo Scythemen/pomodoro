@@ -56,7 +56,7 @@ class RingPainter extends CustomPainter {
 
     canvas.drawArc(
       Rect.fromCircle(center: center, radius: radius),
-      -pi / 2,
+      2 * pi * (1 - settings.percent) - pi / 2,
       2 * pi * settings.percent,
       false,
       foregroundPaint,

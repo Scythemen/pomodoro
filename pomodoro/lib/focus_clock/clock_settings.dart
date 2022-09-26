@@ -10,4 +10,5 @@ class ClockSettings {
   static Color closeButtonColor = Color.fromARGB(255, 255, 255, 255);
   static Duration focusDuration = Duration(minutes: 25);
   static Duration breakDuration = Duration(minutes: 5);
+  static double titleFontSize = 24.0;
 }
