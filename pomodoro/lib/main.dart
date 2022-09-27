@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:local_notifier/local_notifier.dart';
 import 'package:pomodoro/focus_clock/clock_setting_widget.dart';
+import 'package:pomodoro/focus_clock/clock_settings.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'focus_clock/focus_clock_widget.dart';
@@ -41,6 +42,8 @@ void main() async {
     );
   }
 
+  await ClockSettings.ReadConfig();
+
   runApp(const MyApp());
 }
 
@@ -66,7 +69,7 @@ class MyApp extends StatelessWidget {
       ),
 
       // home: const MyHomePage(title: 'Flutter Demo Home Page'),
-      debugShowCheckedModeBanner: true,
+
       initialRoute: "focus_clock",
       routes: {
         "/": (context) => const MyHomePage(title: "flutter home page"),

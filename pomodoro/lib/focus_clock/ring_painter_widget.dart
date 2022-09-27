@@ -3,11 +3,11 @@ import 'dart:math';
 
 class RingPainterSettings {
   double percent = 0.0;
-  Color notCompletedColor = const Color.fromARGB(255, 177, 177, 177);
-  Color completedColor = const Color.fromARGB(255, 235, 73, 73);
+  Color ringBackgroundColor = const Color.fromARGB(255, 177, 177, 177);
+  Color ringForegroundColor = const Color.fromARGB(255, 235, 73, 73);
   String time = "00:00";
   String plan = "FOCUS";
-  Color timeColor = const Color.fromARGB(255, 255, 255, 255);
+  Color ringTimeTextColor = const Color.fromARGB(255, 255, 255, 255);
 }
 
 class RingPainterWidget extends StatelessWidget {
@@ -42,7 +42,7 @@ class RingPainter extends CustomPainter {
     final backgroundPaint = Paint()
       ..isAntiAlias = true
       ..strokeWidth = strokeWidth1
-      ..color = settings.notCompletedColor
+      ..color = settings.ringBackgroundColor
       ..style = PaintingStyle.stroke;
 
     canvas.drawCircle(center, radius, backgroundPaint);
@@ -51,7 +51,7 @@ class RingPainter extends CustomPainter {
       ..isAntiAlias = true
       ..strokeWidth = strokeWidth
       ..strokeCap = StrokeCap.round
-      ..color = settings.completedColor
+      ..color = settings.ringForegroundColor
       ..style = PaintingStyle.stroke;
 
     canvas.drawArc(
@@ -66,7 +66,7 @@ class RingPainter extends CustomPainter {
     var timeTextSpan = TextSpan(
         text: settings.time,
         style: TextStyle(
-            color: settings.timeColor,
+            color: settings.ringTimeTextColor,
             fontWeight: FontWeight.normal,
             fontSize: 60));
 
@@ -85,7 +85,7 @@ class RingPainter extends CustomPainter {
     var planTextSpan = TextSpan(
         text: settings.plan,
         style: TextStyle(
-            color: settings.timeColor,
+            color: settings.ringTimeTextColor,
             fontWeight: FontWeight.normal,
             fontSize: 20));
 
@@ -108,7 +108,9 @@ class RingPainter extends CustomPainter {
   bool shouldRepaint(covariant RingPainter oldDelegate) =>
       oldDelegate.settings.percent != settings.percent ||
       oldDelegate.settings.time != settings.time ||
-      oldDelegate.settings.completedColor != settings.completedColor ||
-      oldDelegate.settings.notCompletedColor != settings.notCompletedColor ||
-      oldDelegate.settings.timeColor != settings.timeColor;
+      oldDelegate.settings.ringForegroundColor !=
+          settings.ringForegroundColor ||
+      oldDelegate.settings.ringBackgroundColor !=
+          settings.ringBackgroundColor ||
+      oldDelegate.settings.ringTimeTextColor != settings.ringTimeTextColor;
 }

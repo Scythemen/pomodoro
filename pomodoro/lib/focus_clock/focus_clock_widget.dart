@@ -31,10 +31,8 @@ class _FocusClockState extends State<FocusClock> with WindowListener {
 
     _ringSettings = RingPainterSettings()
       ..percent = 0
-      ..notCompletedColor = ClockSettings.notCompletedColor
-      ..completedColor = ClockSettings.completedColor
-      ..time = fmt(ClockSettings.focusDuration)
-      ..timeColor = ClockSettings.timeColor;
+      ..time = fmt(ClockSettings.focusDuration);
+    syncColorSettings();
   }
 
   @override
@@ -44,6 +42,14 @@ class _FocusClockState extends State<FocusClock> with WindowListener {
     super.dispose();
   }
 
+  void syncColorSettings() {
+    _ringSettings
+      ..ringBackgroundColor = ClockSettings.theme.ringBackgroundColor
+      ..ringForegroundColor = ClockSettings.theme.ringForegroundColor
+      ..ringTimeTextColor = ClockSettings.theme.ringTimeTextColor
+      ..ringTimeTextColor = ClockSettings.theme.ringTimeTextColor;
+  }
+
   String fmt(Duration d) {
     var arr = d.toString().split('.')[0].split(':');
     if (int.parse(arr[0]) <= 0) arr.removeAt(0);
@@ -51,7 +57,7 @@ class _FocusClockState extends State<FocusClock> with WindowListener {
   }
 
   void _timerCallback(Timer t) {
-    print("${t.tick} , $_counter");
+    debugPrint("${t.tick} , $_counter");
 
     if (_counting) {
       _counter = _counter - const Duration(seconds: 1);
@@ -104,8 +110,10 @@ class _FocusClockState extends State<FocusClock> with WindowListener {
 
   @override
   Widget build(BuildContext context) {
+    syncColorSettings();
+
     return Scaffold(
-      backgroundColor: ClockSettings.backgroundColor,
+      backgroundColor: ClockSettings.theme.backgroundColor,
       body: Center(
           child: Column(
         children: [
@@ -115,15 +123,15 @@ class _FocusClockState extends State<FocusClock> with WindowListener {
               textAlign: TextAlign.center,
               style: TextStyle(
                   height: 2,
-                  fontSize: ClockSettings.titleFontSize,
+                  fontSize: ClockSettings.theme.titleFontSize,
                   fontWeight: FontWeight.bold,
-                  color: ClockSettings.titleColor),
+                  color: ClockSettings.theme.titleColor),
             ),
             endWidget: IconButton(
                 onPressed: _onCloseBottonPress,
                 icon: Icon(
                   Icons.close,
-                  color: ClockSettings.titleColor,
+                  color: ClockSettings.theme.titleColor,
                 )),
           ),
           Padding(
@@ -148,19 +156,19 @@ class _FocusClockState extends State<FocusClock> with WindowListener {
                       onPressed: _resetTimer,
                       icon: const Icon(Icons.refresh),
                       // tooltip: "Reset",
-                      color: ClockSettings.buttonColor,
+                      color: ClockSettings.theme.buttonColor,
                     ),
                     IconButton(
                       icon: _counting
                           ? const Icon(Icons.pause)
                           : const Icon(Icons.play_arrow),
-                      color: ClockSettings.buttonColor,
+                      color: ClockSettings.theme.buttonColor,
                       // tooltip: _counting ? "Pause" : "Start",
                       onPressed: _startStopTimer,
                     ),
                     IconButton(
                       icon: const Icon(Icons.settings),
-                      color: ClockSettings.buttonColor,
+                      color: ClockSettings.theme.buttonColor,
                       // tooltip: "Settings",
                       onPressed: () {
                         Navigator.push(context,
@@ -181,6 +189,6 @@ class _FocusClockState extends State<FocusClock> with WindowListener {
 
   @override
   void onWindowEvent(String eventName) {
-    print('[WindowManager] onWindowEvent: $eventName');
+    debugPrint('[WindowManager] onWindowEvent: $eventName');
   }
 }
