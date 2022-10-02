@@ -11,7 +11,7 @@ on:
   pull_request:
     branches: [ "main" ]
     paths:
-      - pomodoro/*
+      pomodoro/*
 
 jobs:
   build:
