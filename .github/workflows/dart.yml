@@ -41,13 +41,13 @@ jobs:
           uses: thedoctor0/zip-release@master 
           with:
             type: 'zip'
-            filename: pomodoro.{{github.ref_name}}.windows.zip
+            filename: pomodoro.windows
             directory: build/windows/runner/Release
         - name: upload zip
           uses: actions/upload-artifact@v2
           with:
-            name: pomodoro.{{github.ref_name}}.windows.zip
-            path: build/windows/runner/Release/*.zip
+            name: pomodoro.windows.zip
+            path: build/windows/runner/Release/pomodoro.windows.zip
       
      
       
