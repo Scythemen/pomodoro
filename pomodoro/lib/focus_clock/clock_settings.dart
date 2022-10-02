@@ -10,6 +10,7 @@ class ClockSettings {
   static Duration focusDuration = const Duration(minutes: 25);
   static Duration breakDuration = const Duration(minutes: 5);
   static int repeat = 4;
+  
 
   static ThemeSettings theme = ThemeSettings('default');
 

@@ -7,6 +7,7 @@ import 'package:window_manager/window_manager.dart';
 
 import 'clock_settings.dart';
 import 'draggable_form_title_bar_widget.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class FocusClock extends StatefulWidget {
   const FocusClock({super.key});
@@ -58,7 +59,7 @@ class _FocusClockState extends State<FocusClock> with WindowListener {
     return arr.join(':');
   }
 
-  void _timerCallback(Timer t) async {
+  void _timerCallback(Timer t) {
     debugPrint("timer tick: ${t.tick} , $_counter");
 
     if (_counting) {
@@ -78,7 +79,29 @@ class _FocusClockState extends State<FocusClock> with WindowListener {
           _timer = Timer.periodic(const Duration(seconds: 1), _timerCallback);
           _counting = true;
         }
+
+        _playSound();
       }
+    }
+  }
+
+  void _playSound() {
+    final player = AudioPlayer();
+    try {
+      // String audioasset = "assets/bell.wav";
+      // ByteData bytes = await rootBundle.load(audioasset);
+      // Uint8List audiobytes =
+      //     bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes);
+
+      // player.setSourceBytes(audiobytes);
+      var src = AssetSource('bell.wav');
+      src.setOnPlayer(player);
+      debugPrint('play sound $src');
+      player.play(src);
+    } catch (ex) {
+      debugPrint(ex.toString());
+    } finally {
+      // player.dispose();
     }
   }
 
@@ -88,16 +111,23 @@ class _FocusClockState extends State<FocusClock> with WindowListener {
       title: "Round completed",
       body: "Begin a short break",
     );
-    if (currentStatus == 0) {
-      notification.title = "Focus round completed";
-      notification.body =
-          "Please take a short break(${ClockSettings.breakDuration.inMinutes} minutes)";
-    } else {
-      notification.title = "Break finished";
-      notification.body =
-          "Start focusing for ${ClockSettings.focusDuration.inMinutes} minutes";
+    try {
+      if (currentStatus == 0) {
+        notification.title = "Focus round completed";
+        notification.body =
+            "Please take a short break(${ClockSettings.breakDuration.inMinutes} minutes)";
+      } else {
+        notification.title = "Break finished";
+        notification.body =
+            "Start focusing for ${ClockSettings.focusDuration.inMinutes} minutes";
+      }
+      notification.silent = true;
+      notification.show();
+    } catch (ex) {
+      debugPrint(ex.toString());
+    } finally {
+      // notification.destroy();
     }
-    notification.show();
   }
 
   void _updateRing() {
