@@ -148,7 +148,7 @@ class _StatefulSettingWidget extends State<ClockSettingWidget>
                       padding: const EdgeInsets.fromLTRB(30, 30, 30, 0),
                     ),
                     Text(
-                      "Themes:",
+                      "${ClockSettings.themes.length} Themes:",
                       style: TextStyle(
                           color: ClockSettings.theme.titleColor, fontSize: 16),
                     ),

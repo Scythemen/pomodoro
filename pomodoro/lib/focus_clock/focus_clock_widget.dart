@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:local_notifier/local_notifier.dart';
 import 'package:pomodoro/focus_clock/ring_painter_widget.dart';
-import 'package:pomodoro/focus_clock/clock_setting_widget.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'clock_settings.dart';
@@ -23,6 +22,9 @@ class _FocusClockState extends State<FocusClock> with WindowListener {
   late RingPainterSettings _ringSettings;
   Duration _counter = ClockSettings.focusDuration;
   bool _counting = false;
+
+  int _status = 0;
+  int _repeat = 1;
 
   @override
   void initState() {
@@ -56,27 +58,66 @@ class _FocusClockState extends State<FocusClock> with WindowListener {
     return arr.join(':');
   }
 
-  void _timerCallback(Timer t) {
-    debugPrint("${t.tick} , $_counter");
+  void _timerCallback(Timer t) async {
+    debugPrint("timer tick: ${t.tick} , $_counter");
 
     if (_counting) {
       _counter = _counter - const Duration(seconds: 1);
+      _updateRing();
       if (_counter.inSeconds <= 0) {
-        _counter = ClockSettings.focusDuration;
         _counting = false;
         _timer?.cancel();
-        // nofification
-        LocalNotification notification = LocalNotification(
-          title: "Focus round completed",
-          body: "Begin a short break",
-        );
-        notification.show();
-      }
 
+        _notify(_status);
+
+        // await Future.delayed(const Duration(seconds: 3));
+
+        var end = _nextCounter();
+        // is this the end?
+        if (!end) {
+          _timer = Timer.periodic(const Duration(seconds: 1), _timerCallback);
+          _counting = true;
+        }
+      }
+    }
+  }
+
+  void _notify(int currentStatus) {
+    LocalNotification notification = LocalNotification(
+      identifier: "Pomodoro",
+      title: "Round completed",
+      body: "Begin a short break",
+    );
+    if (currentStatus == 0) {
+      notification.title = "Focus round completed";
+      notification.body =
+          "Please take a short break(${ClockSettings.breakDuration.inMinutes} minutes)";
+    } else {
+      notification.title = "Break finished";
+      notification.body =
+          "Start focusing for ${ClockSettings.focusDuration.inMinutes} minutes";
+    }
+    notification.show();
+  }
+
+  void _updateRing() {
+    // focus
+    if (_status == 0) {
       _ringSettings.percent =
           _counter.inSeconds / ClockSettings.focusDuration.inSeconds;
-      _ringSettings.time = fmt(_counter);
+    } else {
+      // in a break
+      _ringSettings.percent =
+          _counter.inSeconds / ClockSettings.breakDuration.inSeconds;
     }
+    if (ClockSettings.repeat != 1) {
+      // show repeat-text
+      _ringSettings.title = "Pomodoro $_repeat";
+    } else {
+      _ringSettings.title = "";
+    }
+    _ringSettings.round = _status == 0 ? 'FOCUS' : 'BREAK';
+    _ringSettings.time = fmt(_counter);
     setState(() {});
   }
 
@@ -84,9 +125,6 @@ class _FocusClockState extends State<FocusClock> with WindowListener {
     if (_counting) {
       _timer?.cancel();
     } else {
-      _ringSettings.percent =
-          _counter.inSeconds / ClockSettings.focusDuration.inSeconds;
-      _ringSettings.time = fmt(_counter);
       _timer = Timer.periodic(const Duration(seconds: 1), _timerCallback);
     }
     _counting = !_counting;
@@ -95,13 +133,44 @@ class _FocusClockState extends State<FocusClock> with WindowListener {
 
   void _resetTimer() {
     _counting = false;
-    _counter = ClockSettings.focusDuration;
+    _timer?.cancel();
+    _counter = _status == 0
+        ? ClockSettings.focusDuration
+        : ClockSettings.breakDuration;
     _ringSettings
       ..percent = 0.0
-      ..time = fmt(ClockSettings.focusDuration);
+      ..time = fmt(_counter);
 
+    _updateRing();
+  }
+
+  void _doubleTapReset() {
+    _counting = false;
     _timer?.cancel();
-    setState(() {});
+    _counter = ClockSettings.focusDuration;
+    _status = 0;
+    _repeat = 1;
+
+    _updateRing();
+  }
+
+  bool _nextCounter() {
+    var end = false;
+    _status = _status == 0 ? 1 : 0;
+    if (_status == 0) {
+      _counter = ClockSettings.focusDuration;
+      _repeat = _repeat + 1;
+      if (_repeat > ClockSettings.repeat) {
+        _repeat = 1;
+        end = true;
+      }
+    } else {
+      _counter = ClockSettings.breakDuration;
+    }
+
+    _updateRing();
+
+    return end;
   }
 
   void _onCloseBottonPress() {
@@ -147,16 +216,19 @@ class _FocusClockState extends State<FocusClock> with WindowListener {
                     settings: _ringSettings,
                   ),
                 ),
-                // Text(_counter.toString()),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    IconButton(
-                      onPressed: _resetTimer,
-                      icon: const Icon(Icons.refresh),
-                      // tooltip: "Reset",
-                      color: ClockSettings.theme.buttonColor,
+                    GestureDetector(
+                      onDoubleTap: _doubleTapReset,
+                      child: IconButton(
+                        onPressed: _resetTimer,
+                        icon: const Icon(Icons.refresh),
+                        tooltip:
+                            "Click to Reset round \n Double-Click to reset all",
+                        color: ClockSettings.theme.buttonColor,
+                      ),
                     ),
                     IconButton(
                       icon: _counting
@@ -167,18 +239,26 @@ class _FocusClockState extends State<FocusClock> with WindowListener {
                       onPressed: _startStopTimer,
                     ),
                     IconButton(
+                      icon: const Icon(Icons.skip_next),
+                      color: ClockSettings.theme.buttonColor,
+                      // tooltip: _counting ? "Pause" : "Start",
+                      onPressed: _nextCounter,
+                    ),
+                    IconButton(
                       icon: const Icon(Icons.settings),
                       color: ClockSettings.theme.buttonColor,
                       // tooltip: "Settings",
                       onPressed: () {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (context) {
-                          return const ClockSettingWidget();
-                        }));
+                        // Navigator.push(context,
+                        //     MaterialPageRoute(builder: (context) {
+                        //   return const ClockSettingWidget();
+                        // }));
+                        Navigator.pushNamed(context, 'clock_setting')
+                            .then((_) => setState(() {}));
                       },
                     ),
                   ],
-                )
+                ),
               ],
             ),
           ),

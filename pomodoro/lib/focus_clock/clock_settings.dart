@@ -53,8 +53,8 @@ class ClockSettings {
       ..buttonColor = const Color(0xFF666666)
       ..closeButtonColor = const Color(0xFFD6D6D6)
       ..ringBackgroundColor = const Color(0xFFD6D6D6)
-      ..ringForegroundColor = const Color(0xFF000000)
-      ..ringTimeTextColor = const Color(0xFF000000)
+      ..ringForegroundColor = const Color(0xFF555555)
+      ..ringTimeTextColor = const Color(0xFF555555)
       ..titleColor = const Color(0xFF666666)
   };
 

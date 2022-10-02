@@ -28,9 +28,9 @@ void main() async {
       await windowManager.focus();
       // await windowManager.setSize(const Size(350, 600), animate: true);
       await windowManager.setResizable(false);
-      var sz = await windowManager.getSize();
-      await windowManager.setMaximumSize(sz);
-      await windowManager.setMinimumSize(sz);
+      // var sz = await windowManager.getSize();
+      // await windowManager.setMaximumSize(sz);
+      // await windowManager.setMinimumSize(sz);
     });
 
     // windowManager.setOpacity(0.9);

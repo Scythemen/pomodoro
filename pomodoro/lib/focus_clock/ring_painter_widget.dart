@@ -6,7 +6,8 @@ class RingPainterSettings {
   Color ringBackgroundColor = const Color.fromARGB(255, 177, 177, 177);
   Color ringForegroundColor = const Color.fromARGB(255, 235, 73, 73);
   String time = "00:00";
-  String plan = "FOCUS";
+  String round = "FOCUS";
+  String title = "";
   Color ringTimeTextColor = const Color.fromARGB(255, 255, 255, 255);
 }
 
@@ -81,27 +82,49 @@ class RingPainter extends CustomPainter {
 
     timeTextPainter.paint(canvas, fontOffset);
 
-// paint plan name
-    var planTextSpan = TextSpan(
-        text: settings.plan,
+// paint round name
+    var roundTextSpan = TextSpan(
+        text: settings.round,
         style: TextStyle(
             color: settings.ringTimeTextColor,
             fontWeight: FontWeight.normal,
-            fontSize: 20));
+            fontSize: 25));
 
-    var planTextPainter = TextPainter(
-        text: planTextSpan,
+    var roundTextPainter = TextPainter(
+        text: roundTextSpan,
         textAlign: TextAlign.left,
         textDirection: TextDirection.ltr);
-    planTextPainter.layout();
+    roundTextPainter.layout();
 
-    var planFontOffset = Offset(
-        (size.width - planTextPainter.size.width) / 2,
-        (size.height - planTextPainter.size.height) / 2 +
+    var roundTextFontOffset = Offset(
+        (size.width - roundTextPainter.size.width) / 2,
+        (size.height - roundTextPainter.size.height) / 2 +
             timeTextPainter.size.height -
             10);
 
-    planTextPainter.paint(canvas, planFontOffset);
+    roundTextPainter.paint(canvas, roundTextFontOffset);
+
+// paint title
+    var titleSpan = TextSpan(
+        text: settings.title,
+        style: TextStyle(
+            color: settings.ringTimeTextColor,
+            fontWeight: FontWeight.normal,
+            fontSize: 17));
+
+    var titlePainter = TextPainter(
+        text: titleSpan,
+        textAlign: TextAlign.left,
+        textDirection: TextDirection.ltr);
+    titlePainter.layout();
+
+    var titleFontOffset = Offset(
+        (size.width - titlePainter.size.width) / 2,
+        (size.height - titlePainter.size.height) / 2 -
+            timeTextPainter.size.height +
+            20);
+
+    titlePainter.paint(canvas, titleFontOffset);
   }
 
   @override
